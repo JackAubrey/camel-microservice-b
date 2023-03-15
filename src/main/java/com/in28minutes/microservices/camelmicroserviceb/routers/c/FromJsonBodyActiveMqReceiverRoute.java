@@ -14,7 +14,7 @@ import java.math.BigDecimal;
 import static org.slf4j.LoggerFactory.getLogger;
 
 @Component
-@ConditionalOnProperty(name = "routers.file.json.2.activemq-router.on", matchIfMissing = false, havingValue = "true")
+@ConditionalOnProperty(name = "routers.file.json.from.activemq-router.on", havingValue = "true")
 public class FromJsonBodyActiveMqReceiverRoute extends RouteBuilder {
     private final CurrencyProcessor currencyProcessor;
     private final CurrencyTransformer currencyTransformer;
@@ -26,14 +26,14 @@ public class FromJsonBodyActiveMqReceiverRoute extends RouteBuilder {
 
     @Override
     public void configure() throws Exception {
-        from("activemq:my-activemq-queue")
+        from("activemq:json-activemq-queue")
                 .log("before deserialization ${body}")
                 .unmarshal().json(JsonLibrary.Jackson, CurrencyExchangeBean.class)
                 .log("after deserialization ${body}")
                 .process(currencyProcessor)
                 .bean(currencyTransformer, "transform")
                 .log("after transformation ${body}")
-                .to("log:received-message-from-active-mq");
+                .to("log:received-json-message-from-active-mq");
     }
 }
 
